@@ -21,6 +21,7 @@
 /build
 
 # misc
+!.kilocode/
 .DS_Store
 *.pem
 
