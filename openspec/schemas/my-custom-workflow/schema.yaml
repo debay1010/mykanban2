@@ -1,18 +1,21 @@
-version: "1.3"
-schema: spec-driven
-specsPath: ./docs/technical-specs
-project_context: "Spec-Driven Development (SDD)"
+name: my-custom-workflow
+version: 1
+description: "A workflow with enforced template paths"
+
 
 # OpenSpec 1.3+ Prescriptive Paths
 artifacts:
-  proposal:
-    path: "openspec/changes/<change-id>/proposal.md"
-    template_path: "templates/proposal_template.md"
+  - id: proposal
+    generate: proposal.md #
+    description: "initial proposal document"
+    template: "c_proposal_template.md"
     required_sections: ["Value Proposition", "Problem Statement", "Target Audience", "USP", "Target Platforms", "Goals", "Non-Goals (Out of Scope)", "Success Metrics", "Monetization", "Critical Questions or Clarifications"]
+    requires: []
 
-  spec:
-    path: "openspec/changes/<change-id>/specs/<capability>/spec.md"
-    template_path: "templates/spec_template.md"
+  - id: specs
+    generate: "{{specsPath}}/{{changeName}}_spec.md"
+    description: "Technical Specification"
+    template: "c_spec_template.md"
     strict_hierarchy: 
       level_1: "Feature (##)"
       level_2: "User Requirement (###)"
@@ -22,20 +25,26 @@ artifacts:
     prioritization:
       scale: ["P0", "P1", "P2", "P3"]
       rule: "Every User Story title must append a priority tag (e.g., [P0])."
+      requires: []
 
-  design:
-    path: "openspec/changes/<change-id>/design.md"
-    template_path: "templates/design_template.md"
+  - id: design
+    generate: "design.md"
+    description: "design document"
+    template: "c_design_template.md"
     required_sections: ["Architecture Overview", "Data Architechture", "API Design", "Global Error & Resilience Strategy", "Security & Privacy", "User Interface Specifications"]
+    requires: [spec.md]
+    
 
-  tasks:
-    path: "openspec/changes/<change-id>/tasks.md"
-    template_path: "templates/tasks_template.md"
+  - id: tasks
+    generate: "tasks.md"
+    description: "tasks document"
+    template: "c_tasks_template.md"
     formatting_rules:
       mandatory_tags: ["[FE]", "[BE]", "[UI]", "[DEVOPS]", "[ERROR]"]
       mandatory_fields: ["Tag", "Task ID", "Description", "Reference"]
       reference_logic: "Every task   link to a Story ID or AC Scenario from spec.md via relative markdown links."
 
+    
 agent_logic:
   header_integrity: "STRICT: Do not change markdown header levels (###/####). Fill placeholders only."
   linking_rule: "Link tasks to spec anchors: [Ref: Story](./specs/<capability>/spec.md#header)"
